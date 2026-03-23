@@ -1,0 +1,757 @@
+<!DOCTYPE html> 
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúfáng | 厨房</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="favicon-32x32.png">
+    
+   
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+
+        body {
+            font-family: Georgia, 'Times New Roman', Times;
+            color: #ffffff;
+            min-height: 100vh;
+            background-color: #f5f6fa;
+        }
+
+        header {
+            background: #a20000;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .content-wrapper {
+            margin-top: 60px;
+            background-image: url("nyforside.webp");
+            background-size: 100% auto;
+            background-position: top center;
+            background-repeat: no-repeat;
+            min-height: calc(100vh - 60px);
+        }
+
+        .menu-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .menu-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        .sidemenu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 250px;
+            height: 100vh;
+            background-color: #ffffff;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidemenu.active {
+            left: 0;
+        }
+
+        .menu-header {
+            background: #a20000;
+            color: white;
+            padding: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+            background-color: white;
+            color: #333;
+            transition: background-color 0.2s;
+        }
+
+        .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        .submenu.active {
+            max-height: 500px;
+        }
+
+        .submenu-item {
+            padding: 12px 20px 12px 40px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            color: #555;
+            transition: background-color 0.2s;
+        }
+
+        .submenu-item:hover {
+            background-color: #e0e0e0;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 999;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .product-section {
+            display: none;
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-image: url("bambusbaggrund.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .product-section.active {
+            display: block;
+        }
+
+        .section-title {
+            color: #a20000;
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .back-button {
+            background: #a20000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 1em;
+            border-radius: 5px;
+        }
+
+        .back-button:hover {
+            background: #a20000;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .product-item {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .product-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-name {
+            color: #333;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #a20000;
+            color: #ffffff;
+            padding: 40px 0 0 0;
+            margin-top: 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 30px 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            color: #cccccc;
+        }
+
+        .footer-column p {
+            line-height: 1.8;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .image-grid img {
+            width: 100%;
+            height: 60px;
+            object-fit: contain;
+            background-color: #ffffff00;
+            border-radius: 4px;
+            padding: 5px;
+        }
+
+        .footer-bottom {
+            background-color: #790000;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .footer-bottom p {
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        @media (max-width: 1200px) {
+            .product-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <button class="menu-btn" id="menuBtn">
+        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828859.png" alt="Menu">
+    </button>
+    <h1>Chúfáng | 厨房</h1>
+</header>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="content-wrapper" id="homepage">
+    <!-- Forside indhold -->
+</div>
+
+<!-- Knive Sektion -->
+<div class="product-section" id="knive-section">
+    <br><br><br>
+    <button class="back-button" onclick="showHomepage()">← Tilbage til forsiden</button>
+    <h2 class="section-title">Knive</h2>
+    <div class="product-grid">
+        <div class="product-item">
+            <img src="kniv1.webp" alt="Kniv 1" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Santoku med bambushåndtag</div>
+                <div class="product-price">899 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="kniv2.webp" alt="Kniv 2" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Nakiri med bambushåndtag</div>
+                <div class="product-price">649 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="kniv3.jpg" alt="Kniv 3" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Wusaki Padouk med bambushåndtag</div>
+                <div class="product-price">499 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="kniv4.webp" alt="Kniv 4" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Santoku med bambus håndtag</div>
+                <div class="product-price">599 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="kniv5.webp" alt="Kniv 5" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Urtekniv med bambus håndtag</div>
+                <div class="product-price">249 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="kniv6.webp" alt="Kniv 6" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Brødkniv med bambushåndtag</div>
+                <div class="product-price">499 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="kniv7.jpg" alt="Kniv 7" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Gyuto Chef's Knife</div>
+                <div class="product-price">1299 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="kniv8.png" alt="Kniv 8" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Udbenerkniv med bambushåndtag</div>
+                <div class="product-price">435 kr</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Service Sektion -->
+<div class="product-section" id="service-section">
+    <br><br><br>
+    <button class="back-button" onclick="showHomepage()">← Tilbage til forsiden</button>
+    <h2 class="section-title">Service</h2>
+    <div class="product-grid">
+        <div class="product-item">
+            <img src="bambusbestik.webp" alt="Service 1" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Bestik i bambus (1 sæt)</div>
+                <div class="product-price">39 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="bambusbestik.webp" alt="Service 2" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Bestik i bambus (3 sæt)</div>
+                <div class="product-price">99 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="bambusbestik.webp" alt="Service 3" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Bestik i bambus (5 sæt)</div>
+                <div class="product-price">139 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="bambusbestik.webp" alt="Service 4" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Bestik i bambus (10 sæt)</div>
+                <div class="product-price">219 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="bestikkasse.jpg" alt="Service 5" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Kasse til bestik (inkl. bestik)</div>
+                <div class="product-price">379 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="bestikkasse.jpg" alt="Service 6" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Kasse til bestik (ekskl. bestik)</div>
+                <div class="product-price">299 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="skåle.avif" alt="Service 7" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Skåle blå inkl. skeer (4 stk.)</div>
+                <div class="product-price">599 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="skåle4.webp" alt="Service 8" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Skåle blå ekskl. skeer (4 stk.)</div>
+                <div class="product-price">499 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="skeer.avif" alt="Service 9" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Skeer blå (4stk.)</div>
+                <div class="product-price">115 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="lyserødskål.webp" alt="Service 10" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Lyserød skål (1 stk.)</div>
+                <div class="product-price">129 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="tallerken.webp" alt="Service 11" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Tallerken blå (1 stk.)</div>
+                <div class="product-price">149 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="tallerken.webp" alt="Service 12" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Tallerken blå (3 stk.)</div>
+                <div class="product-price">399 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="tallerken.webp" alt="Service 13" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Tallerken blå (5 stk.)</div>
+                <div class="product-price">549 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="tallerken.webp" alt="Service 14" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Tallerken blå (10 stk.)</div>
+                <div class="product-price">999 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="fade.jpg" alt="Service 15" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Fade blå (3 stk.)</div>
+                <div class="product-price">2249 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="spisepinde.jpg" alt="Service 16" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Panda spisepinde (5 stk.)</div>
+                <div class="product-price">299 kr</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Skærebrætter Sektion -->
+<div class="product-section" id="skaerebraetter-section">
+    <br><br><br>
+    <button class="back-button" onclick="showHomepage()">← Tilbage til forsiden</button>
+    <h2 class="section-title">Skærebrætter</h2>
+    <div class="product-grid">
+        <div class="product-item">
+            <img src="skærebrætsæt.jpg" alt="Bræt 1" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Skærebræt i bambus(sæt med 3)</div>
+                <div class="product-price">399 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="skærebrætsæt3.jpeg" alt="Bræt 2" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Skærebræt i bambus (sæt med 2)</div>
+                <div class="product-price">325 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="skærebrætsæt2.webp" alt="Bræt 3" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Skærebræt med håndtag i bambus (sæt med 3)</div>
+                <div class="product-price">425 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="skærebræthåndtag.jpg" alt="Bræt 4" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Skærebræt med håndtag i bambus (lille)</div>
+                <div class="product-price">199 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="skærebrætlille.Jpg" alt="Bræt 5" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Skærebræt i bambus (lille)</div>
+                <div class="product-price">179 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="skærebrætmedium.jpg" alt="Bræt 6" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Skærebræt i bambus (medium)</div>
+                <div class="product-price">249 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="skærebrætstor.jpg" alt="Bræt 7" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Skærebræt i bambus (stor)</div>
+                <div class="product-price">325 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="skærebrætholder.avif" alt="Bræt 8" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Skærebrætsholer i bambus</div>
+                <div class="product-price">399 kr</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gryder og pander Sektion -->
+<div class="product-section" id="gryder-section">
+    <br><br><br>
+    <button class="back-button" onclick="showHomepage()">← Tilbage til forsiden</button>
+    <h2 class="section-title">Gryder og Pander</h2>
+    <div class="product-grid">
+        <div class="product-item">
+            <img src="wok.jpg" alt="Gryde 1" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Wok med bambushåndtag</div>
+                <div class="product-price">699 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="pan.jpg" alt="Gryde 2" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Flad stegepande med bambushåndtag</div>
+                <div class="product-price">499 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="pot.jpg" alt="Gryde 3" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Traditionel høj gryde</div>
+                <div class="product-price">1499 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="teapot2.webp" alt="Gryde 4" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Te kande med bambushåndtag</div>
+                <div class="product-price">349 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="teapotset.jpg" alt="Gryde 5" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Te kande sæt (med 3 kopper)</div>
+                <div class="product-price">625 kr</div>
+            </div>
+        </div>
+        <div class="product-item">
+            <img src="lergryde.jpg" alt="Gryde 6" class="product-image">
+            <div class="product-info">
+                <div class="product-name">Bo-Chai lergryde med låg</div>
+                <div class="product-price">649 kr</div>
+            </div>
+        </div>
+    </div>
+</div>
+<nav class="sidemenu" id="sidemenu">
+    <div class="menu-header">Menu | 菜单</div>
+    
+    <div class="menu-item" onclick="toggleSubmenu('submenu1')">
+        Produkter | 产品
+    </div>
+    <div class="submenu" id="submenu1">
+        <div class="submenu-item" onclick="showSection('knive-section')">Knive | 刀</div>
+        <div class="submenu-item" onclick="showSection('service-section')">Service | 陶器</div>
+        <div class="submenu-item" onclick="showSection('skaerebraetter-section')">Skærebrætter | 切菜板</div>
+        <div class="submenu-item" onclick="showSection('gryder-section')">Gryder og pander | 锅碗瓢盆</div>
+    </div>
+    
+    <div class="menu-item" onclick="toggleSubmenu('submenu2')">
+        Madplaner | 膳食计划
+    </div>
+    <div class="submenu" id="submenu2">
+        <div class="submenu-item">Vegetarisk | 素食主义者</div>
+        <div class="submenu-item">Hurtig mad | 快餐</div>
+        <div class="submenu-item">Traditionel mad | 传统食品</div>
+        <div class="submenu-item">Bambus | 竹子</div>
+    </div>
+
+    <div class="menu-item" onclick="toggleSubmenu('submenu3')">
+        Om os | 关于我们
+    </div>
+    <div class="submenu" id="submenu3">
+        <div class="submenu-item">Vores historie | 我们的历史</div>
+        <div class="submenu-item">Vores resturanter | 我们的餐厅</div>
+    </div>
+</nav>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-content">
+        <!-- Kolonne 1: Adresse -->
+        <div class="footer-column">
+            <h3>Adresse</h3>
+            <p>
+                Chúfáng<br>
+                Flæsketorvet 63<br>
+                1711 København V<br>
+                Danmark
+            </p>
+        </div>
+
+        <!-- Kolonne 2: Kontakt -->
+        <div class="footer-column">
+            <h3>Kontakt</h3>
+            <p>
+                Tlf: (+45)  70 12 34 56<br>
+                Email: info@chufang.dk<br>
+                CVR nr: 69200967
+            </p>
+        </div>
+
+        <!-- Kolonne 3: Social -->
+        <div class="footer-column">
+            <h3>Social</h3>
+            <div class="image-grid">
+                <img src="facebook.png" alt="Facebook">
+                <img src="instagram.png" alt="Instagram">
+                <img src="x.png" alt="Twitter">
+                <img src="youtube.png" alt="YouTube">
+                <img src="whatsapp.webp" alt="WhatsApp">
+            </div>
+        </div>
+
+        <!-- Kolonne 4: Betalinger -->
+        <div class="footer-column">
+            <h3>Betalinger</h3>
+            <div class="image-grid">
+                <img src="dankort.webp" alt="Visa">
+                <img src="visa.jpg" alt="Mastercard">
+                <img src="mastercard.png" alt="American Express">
+                <img src="paypal.png" alt="PayPal">
+                <img src="mobilepay.png" alt="MobilePay">
+                <img src="klarna.png" alt="Klarna">
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer bund med centreret tekst -->
+    <div class="footer-bottom">
+        <p>Copyright © 2024 Chúfáng - Alle rettigheder forbeholdes</p>
+    </div>
+</footer>
+
+<script>
+    const menuBtn = document.getElementById('menuBtn');
+    const sidemenu = document.getElementById('sidemenu');
+    const overlay = document.getElementById('overlay');
+
+    menuBtn.addEventListener('click', function() {
+        sidemenu.classList.toggle('active');
+        overlay.classList.toggle('active');
+    });
+
+    overlay.addEventListener('click', function() {
+        sidemenu.classList.remove('active');
+        overlay.classList.remove('active');
+    });
+
+    function toggleSubmenu(submenuId) {
+        const submenu = document.getElementById(submenuId);
+        submenu.classList.toggle('active');
+    }
+
+    function showSection(sectionId) {
+        document.getElementById('homepage').style.display = 'none';
+        const sections = document.querySelectorAll('.product-section');
+        sections.forEach(section => section.classList.remove('active'));
+        document.getElementById(sectionId).classList.add('active');
+        sidemenu.classList.remove('active');
+        overlay.classList.remove('active');
+        window.scrollTo(0, 0);
+    }
+
+    function showHomepage() {
+        const sections = document.querySelectorAll('.product-section');
+        sections.forEach(section => section.classList.remove('active'));
+        document.getElementById('homepage').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+</script>
+
+</body>
+</html>
